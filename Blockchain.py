@@ -48,9 +48,9 @@ class Blockchain():
                 currentTransactions += transaction
             return hashlib.sha256(currentTransactions.encode()).hexdigest()
 
-blockchain = Blockchain()
-t1 = blockchain.addTransaction("Satoshi|Mike|5 BTC")
-t2 = blockchain.addTransaction("Mike|Satoshi|1 BTC")
-t3 = blockchain.addTransaction("Satoshi|Hal Finney|5 BTC")
-blockchain.newBlock(12345)
-print("Genesis block: ", blockchain.blockchain)
+# blockchain = Blockchain()
+# t1 = blockchain.addTransaction("Satoshi|Mike|5 BTC")
+# t2 = blockchain.addTransaction("Mike|Satoshi|1 BTC")
+# t3 = blockchain.addTransaction("Satoshi|Hal Finney|5 BTC")
+# blockchain.newBlock(12345)
+# print("Genesis block: ", blockchain.blockchain)

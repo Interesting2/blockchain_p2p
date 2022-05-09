@@ -81,5 +81,5 @@ class BlockchainServer():
         except:
             print("Can't connect to the Socket")
 
-server = BlockchainServer()
-server.run()
+# server = BlockchainServer()
+# server.run()

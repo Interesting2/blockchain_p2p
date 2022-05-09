@@ -72,5 +72,5 @@ class BlockchainClient():
         except:
             print("Can't connect to the Blockchain server")
 
-client = BlockchainClient()
-client.run()
+# client = BlockchainClient()
+# client.run()
