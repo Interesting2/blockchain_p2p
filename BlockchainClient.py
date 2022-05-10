@@ -7,16 +7,36 @@ import sys
 import json
 
 HOST = "127.0.0.1"
-PORT_Server = 1993
+# PORT_Server = 1993
 
 class BlockchainClient():
     def __init__(self, *args):
+        self.peer_id, self.port_no, self.neighbours = args
         self.args = args    
+
+    def periodic_heartbeat(self):
+        while True:
+            requestContent = "hb"
+            mess_data = bytes(requestContent, encoding= 'utf-8')
+            for neighbour in self.neighbours:
+                with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                    s.connect((HOST, self.port_no))
+                    s.sendall(mess_data)
+
+                    data_rev = s.recv(1024) # blockchain received in json from all other servers
+                    blockchainJson = data_rev.decode('utf-8')
+                    print(blockchainJson)
+
+                    # TODO : process blockchain received from other servers
+                    blockchain = json.loads(blockchainJson)
+
+                    s.close()
+            time.sleep(5)
 
     def run(self):
         try:
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s: # Create a socket object
-                s.connect((HOST, PORT_Server))
+                s.connect((HOST, self.port_no))
                 while(1):
             
                     # Parser for input command
@@ -49,7 +69,7 @@ class BlockchainClient():
                         print("tx sender content -- [tx: command type of transaction] [sender of transaction] [content of transaction]")
                         print("pb -- [pb: command type of Print Blockchain]")
                         print("cc -- [cc: command type of Close Connection]")
-                        continue
+                        continue    
                     
                     # Create message for sending to Blockchain server
                     mess_data = bytes(requestContent, encoding= 'utf-8')

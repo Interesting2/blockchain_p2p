@@ -9,16 +9,15 @@ import sys
 class BlockchainPeer():
     def __init__(self, *args):
         self.peer_id, self.port_no, self.config_file = args
-        self.neighbour = [] # store a tuple | (id, port_no)
+        self.neighbour = {} # store id as key, port_no as value
 
-    def parse_file(self):
+    def setUpNeighbours(self):
         with open(self.config_file, 'r') as f:
             lines = f.readlines()
-            num_lines = lines[0].strip('\n')
+            num_lines = int(lines[0].strip('\n'))
             for i in range(1, num_lines + 1):
                 neighbour_id, neigbour_port = lines[i].strip('\n').split(" ")
-                neighbour_content = (neighbour_id, neigbour_port)
-                self.neighbour.append(neighbour_content)
+                self.neighbour[neighbour_id] = neigbour_port
             print("Neighbours: ")
             print(self.neighbour)
 
@@ -26,7 +25,18 @@ class BlockchainPeer():
 
 
     def run(self):
-        file_content = self.parse_file()
+        self.setUpNeighbours()
+
+        # create miner, server and client
+        server = BlockchainServer(self.peer_id, self.port_no, self.neighbour)
+        client = BlockchainClient(self.peer_id, self.port_no, self.neighbour)
+        miner = BlockchainMiner(self.peer_id, self.port_no, self.neighbour)
+
+        # start server, client and miner
+        server.run()
+        client.run()
+        miner.run()
+
 
 
 if __name__ == "__main__":

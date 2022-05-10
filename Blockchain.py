@@ -17,7 +17,7 @@ class Blockchain():
             'transaction': self.pool,
             'proof': proof,
             'previousHash': previousHash or self.calculateHash(self.blockchain[-1]),
-            'currentHash': self.currentHash(self.pool)
+            'currentHash': self.currentHash(self.pool, proof)
         }
         self.pool = []
         self.blockchain.append(block)
@@ -39,13 +39,17 @@ class Blockchain():
         lastBlock = self.lastBlock()
         return lastBlock['index'] + 1
         
-    def currentHash(self, pool):
+    def currentHash(self, pool, proof):
+
+        # previousHash + current transactions in pool + proof
+
         currentTransactions = ""
         if len(pool) > 0:
             previousHash = self.calculateHash(self.lastBlock())
             currentTransactions += previousHash
             for transaction in pool:
                 currentTransactions += transaction
+            currentTransactions += proof
             return hashlib.sha256(currentTransactions.encode()).hexdigest()
 
 # blockchain = Blockchain()
