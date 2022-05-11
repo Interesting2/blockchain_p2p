@@ -13,38 +13,48 @@ HOST = "127.0.0.1"
 class BlockchainMiner():
     def __init__(self, *args):
         self.peer_id, self.port_no, self.neighbours = args
-        self.latest_proof = 100
+        self.latest_proof = 0
     
     def run(self):
-        while True:
-            latest_proof = self.get_proof()
-            if latest_proof != self.latest_proof:
-                # self.update_proof(latest_proof)
-                self.latest_proof = latest_proof
-                new_proof = self.proof_of_work(latest_proof)
-                print(f"New proof: {new_proof}")
-                self.update_proof(new_proof)
-            time.sleep(1)
+        try:
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                s.connect((HOST, self.port_no))
+                
+                while True:
+                    latest_proof = self.get_proof(s)
+                    # print("Miner: ", latest_proof)
+                    if latest_proof != self.latest_proof:
+                        print("COMPARE LATEST PROOFS")
+                        print(latest_proof, self.latest_proof)
+                        # self.update_proof(latest_proof)
+                        self.latest_proof = latest_proof
+                        new_proof = self.proof_of_work(latest_proof)
+                        print(f"New proof: {new_proof}")
+                        self.update_proof(new_proof, s)
+                    time.sleep(10)
+                s.close()
+        except Exception as e:
+            print(e)
+            print("Miner Can't connect to the Socket")
     
-    def get_proof(self):
+    def get_proof(self, s):
         # send request to server
         requestString = "gp"
         # send request to server
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            s.connect((HOST, self.port_no))
-            s.send(requestString.encode('utf-8'))
-            data = s.recv(1024)
-        s.close()
+        data = None
+        s.send(requestString.encode('utf-8'))
+        data = s.recv(1024)
+        # print("PROOF RETURNED: ", data.decode('utf-8'))
+       
         return int(data.decode('utf-8'))
 
 
-    def update_proof(self, new_proof):
+    def update_proof(self, new_proof, s):
         requestString = "up | " + str(new_proof)
         # send request to server
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            s.connect((HOST, self.port_no))
-            s.send(requestString.encode('utf-8'))
-        s.close()
+        s.send(requestString.encode('utf-8'))
+        data = s.recv(1024)
+        # print("REWARD RESPONSE: ", data.decode('utf-8'))
 
     def calculateHash(self, data):
         return hashlib.sha256(data.encode('utf-8')).hexdigest()

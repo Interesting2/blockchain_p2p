@@ -7,7 +7,7 @@ class Blockchain():
     def  __init__(self):
         self.blockchain = []
         self.pool = []
-        self.poolLimit = 3
+        self.poolLimit = 5
         self.newBlock(previousHash="The Times 03/Jan/2009 Chancellor on brink of second bailout for banks.", proof=100)
 
     def newBlock(self, proof, previousHash = None):
@@ -49,7 +49,7 @@ class Blockchain():
             currentTransactions += previousHash
             for transaction in pool:
                 currentTransactions += transaction
-            currentTransactions += proof
+            currentTransactions += str(proof)
             return hashlib.sha256(currentTransactions.encode()).hexdigest()
 
 # blockchain = Blockchain()

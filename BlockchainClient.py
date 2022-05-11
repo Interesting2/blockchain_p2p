@@ -14,26 +14,10 @@ class BlockchainClient():
         self.peer_id, self.port_no, self.neighbours = args
         self.args = args    
 
-    def periodic_heartbeat(self):
-        while True:
-            requestContent = "hb"
-            mess_data = bytes(requestContent, encoding= 'utf-8')
-            for neighbour in self.neighbours:
-                with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-                    s.connect((HOST, self.port_no))
-                    s.sendall(mess_data)
-
-                    data_rev = s.recv(1024) # blockchain received in json from all other servers
-                    blockchainJson = data_rev.decode('utf-8')
-                    print(blockchainJson)
-
-                    # TODO : process blockchain received from other servers
-                    blockchain = json.loads(blockchainJson)
-
-                    s.close()
-            time.sleep(5)
+    
 
     def run(self):
+        # _thread.start_new_thread(self.periodic_heartbeat, ())   # new thread for sending hb requests
         try:
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s: # Create a socket object
                 s.connect((HOST, self.port_no))
@@ -41,6 +25,7 @@ class BlockchainClient():
             
                     # Parser for input command
                     commandContent = input("Please enter your command: ")
+                    print("CLIENT ASKING")
                     content = commandContent.split(" ")
                     commandType = content[0]
 
@@ -82,15 +67,20 @@ class BlockchainClient():
                         print("didn't get data")
                         break
                     if commandType == 'pb':
+                        # blockchainJson = json.loads(dataString)
                         print(json.dumps(dataString, indent=2, sort_keys=False))
                     elif commandType == 'cc':
                         print(dataString)
                         break
+                    elif commandType == 'tx':
+                        print("Client Transaction response from server: ", dataString)
                     else:
-                        print(dataString)
+                        print("Server general response to Client: ", dataString)
                 s.close()   
-        except:
-            print("Can't connect to the Blockchain server")
+        except Exception as e:
 
-# client = BlockchainClient()
+            print("Can't connect to the Blockchain server")
+            print(e)
+
+# client = BlockchainClient('A', 6000, {})
 # client.run()
