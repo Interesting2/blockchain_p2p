@@ -31,7 +31,7 @@ class BlockchainMiner():
                         new_proof = self.proof_of_work(latest_proof)
                         # print(f"New proof: {new_proof}")
                         self.update_proof(new_proof, s)
-                    time.sleep(1)
+                    time.sleep(10)
                 s.close()
         except Exception as e:
             print(e)

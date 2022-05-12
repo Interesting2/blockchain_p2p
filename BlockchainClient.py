@@ -28,7 +28,7 @@ class BlockchainClient():
             
                     # Parser for input command
                     commandContent = input("Please enter your command: ")
-                    print("CLIENT ASKING")
+                    # print("CLIENT ASKING")
                     content = commandContent.split(" ")
                     commandType = content[0]
 
@@ -70,21 +70,24 @@ class BlockchainClient():
                         print("didn't get data")
                         break
                     if commandType == 'pb':
-                        # blockchainJson = json.loads(dataString)
-                        print(json.dumps(dataString, indent=2, sort_keys=False))
+                        # prints prettified blockchain json
+                        print(dataString)
                     elif commandType == 'cc':
-                        print("Client: ", dataString)
+                        # print("Client: ", dataString)
                         break
                     elif commandType == 'tx':
-                        print("Client Transaction response from server: ", dataString)
+                        # print(dataString)
+                        pass
+                        # print("Client Transaction response from server: ", dataString)
                     else:
-                        print("Server general response to Client: ", dataString)
+                        # print("Server general response to Client: ", dataString)
+                        pass
                 s.close()   
         except Exception as e:
 
             print("Can't connect to the Blockchain server")
             print(e)
-        print("END OF CLIENT")
+        # print("END OF CLIENT")
 
 # client = BlockchainClient('A', 6000, {})
 # client.run()

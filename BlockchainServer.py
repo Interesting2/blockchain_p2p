@@ -25,14 +25,12 @@ class BlockchainServer():
 
     def validate_pow(self, blockchain):
         # print("VALIDATING POW")
-        try:
-            proof = int(blockchain[-1]['proof'])
-            prev_proof = int(blockchain[-2]['proof'])
-            hash_operation = hashlib.sha256(str(proof**2 - prev_proof**2).encode('utf-8')).hexdigest()
 
-            # validate first two digit of the hash
-        except Exception as e:
-            print("validate_pow() Error: ", e)
+        proof = int(blockchain[-1]['proof'])
+        prev_proof = int(blockchain[-2]['proof'])
+        hash_operation = hashlib.sha256(str(proof**2 - prev_proof**2).encode('utf-8')).hexdigest()
+
+        # validate first two digit of the hash
         return hash_operation[:2] == '00'
 
 
@@ -58,7 +56,7 @@ class BlockchainServer():
                         # print("Transaction ", transaction, " is part of the last block")
                         self.blockchain.pool.remove(transaction)
             else:
-                print("POW is incorrect")
+                # print("POW is incorrect")
                 return
 
 
@@ -84,10 +82,10 @@ class BlockchainServer():
 
                         s.close()
                 except Exception as e:
-                    # pass
-                    print("Peer's Server socket not yet establised")
-                    print(e)
-            time.sleep(5)
+                    pass
+                    # print("Peer's Server socket not yet establised")
+                    # print(e)
+            time.sleep(15)
 
     def serverHandler(self, c , addr):
         # get peer name
@@ -102,7 +100,7 @@ class BlockchainServer():
             # Parsing and processing data from client
             data_rev = c.recv(1024)
             if len(data_rev) == 0 or not data_rev:
-                print("Peer's socket closed")
+                # print("Peer's socket closed")
                 break
 
             dataString = data_rev.decode('utf-8')
@@ -139,7 +137,7 @@ class BlockchainServer():
                                     # print("Transaction Response from other peer's server: ", response)
                                     s.close()
                             except Exception as e:
-                                print("Send transaction error: ", e)
+                                # print("Send transaction error: ", e)
                                 pass
 
                 else:
@@ -147,8 +145,8 @@ class BlockchainServer():
 
             # Handle pb request
             elif typeRequest == 'pb':
-                print(json.dumps(self.blockchain.blockchain, indent=2, sort_keys=False))
-                clientData = str(self.blockchain.blockchain)
+                # print(json.dumps(self.blockchain.blockchain, indent=2, sort_keys=False))
+                clientData = json.dumps(self.blockchain.blockchain, indent=2, sort_keys=False)
 
             # Handle cc request
             elif typeRequest == 'cc':
@@ -194,7 +192,7 @@ class BlockchainServer():
 
 
             # create new block if #transactions == 5
-            print(len(self.blockchain.pool), "transactions in pool")
+            # print(len(self.blockchain.pool), "transactions in pool")
             if len(self.blockchain.pool) == 5:
                 self.blockchain.newBlock(self.proof)
 
@@ -202,10 +200,10 @@ class BlockchainServer():
             c.sendall(clientData)
             
             if typeRequest == 'cc':
-                print("Client thread closing")
+                # print("Client thread closing")
                 break
         c.close()
-        print("Client thread closed")
+        # print("Client thread closed")
         return
 
     def run(self):
@@ -217,8 +215,8 @@ class BlockchainServer():
 
         try:
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-                print("Blockchain Server start") 
-                print("Blockchain Server host names: ", IP, "Port: ", self.port_no)
+                # print("Blockchain Server start") 
+                # print("Blockchain Server host names: ", IP, "Port: ", self.port_no)
 
                 s.bind((IP, self.port_no)) # Bind to the port
                 s.listen(5)
@@ -227,7 +225,7 @@ class BlockchainServer():
                     # if cc == 'cc': 
                     #     break
                     c, addr = s.accept()
-                    print("Address connected to server: ", addr)
+                    # print("Address connected to server: ", addr)
                     # print(self.saved_address)
                     # print(socket.socket.getpeername())
                     # time.sleep(1)

@@ -23,9 +23,9 @@ class Transaction():
             contentValidation = True
         
         if senderValidation == True and contentValidation == True:
-            print("Valid Transaction")
+            # print("Valid Transaction")
             return transaction
         else:
-            print("Invalid Transaction")
+            # print("Invalid Transaction")
             return None
         

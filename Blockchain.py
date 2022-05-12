@@ -30,7 +30,7 @@ class Blockchain():
         blockString = blockObject.encode()
         rawHash = hashlib.sha256(blockString)
         hexHash = rawHash.hexdigest()
-        print("Prev hash: ", hexHash)
+        # print("Prev hash: ", hexHash)
         return hexHash
     
     def addTransaction(self, transaction):

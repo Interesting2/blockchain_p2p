@@ -25,8 +25,8 @@ class BlockchainPeer():
             for i in range(1, num_lines + 1):
                 neighbour_id, neigbour_port = lines[i].strip('\n').split(" ")
                 self.neighbour[neighbour_id] = int(neigbour_port)
-            print("Neighbours: ")
-            print(self.neighbour)
+            # print("Neighbours: ")
+            # print(self.neighbour)
 
 
     def execute(self, role):
