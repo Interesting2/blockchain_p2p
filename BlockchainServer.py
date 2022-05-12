@@ -88,7 +88,6 @@ class BlockchainServer():
             # Parsing and processing data from client
             data_rev = c.recv(1024)
             if len(data_rev) == 0 or not data_rev:
-                cc = 'cc'
                 break
 
             dataString = data_rev.decode('utf-8')
@@ -174,7 +173,8 @@ class BlockchainServer():
             if typeRequest == 'cc':
                 break
         c.close()
-        sock.close()
+        if cc == 'cc':
+            sock.close()
         return
 
     def run(self):

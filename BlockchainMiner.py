@@ -31,7 +31,6 @@ class BlockchainMiner():
                     time.sleep(1)
                 s.close()
         except Exception as e:
-            print(e)
             print("Miner Can't connect to the Socket")
     
     def get_proof(self, s):
@@ -49,7 +48,6 @@ class BlockchainMiner():
         # send request to server
         s.send(requestString.encode('utf-8'))
         data = s.recv(1024)     # receive reward or no reward from server
-        print(data.decode('utf-8'))
 
     def calculateHash(self, data):
         return hashlib.sha256(data.encode('utf-8')).hexdigest()
