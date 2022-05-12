@@ -24,14 +24,14 @@ class BlockchainMiner():
                     latest_proof = self.get_proof(s)
                     # print("Miner: ", latest_proof)
                     if latest_proof != self.latest_proof:
-                        print("COMPARE LATEST PROOFS")
-                        print(latest_proof, self.latest_proof)
+                        # print("COMPARE LATEST PROOFS")
+                        # print(latest_proof, self.latest_proof)
                         # self.update_proof(latest_proof)
                         self.latest_proof = latest_proof
                         new_proof = self.proof_of_work(latest_proof)
-                        print(f"New proof: {new_proof}")
+                        # print(f"New proof: {new_proof}")
                         self.update_proof(new_proof, s)
-                    time.sleep(10)
+                    time.sleep(1)
                 s.close()
         except Exception as e:
             print(e)

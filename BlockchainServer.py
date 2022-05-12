@@ -24,7 +24,7 @@ class BlockchainServer():
         self.saved_address = {}
 
     def validate_pow(self, blockchain):
-        print("VALIDATING POW")
+        # print("VALIDATING POW")
         try:
             proof = int(blockchain[-1]['proof'])
             prev_proof = int(blockchain[-2]['proof'])
@@ -38,24 +38,24 @@ class BlockchainServer():
 
     def sync_blockchain(self, blockchain):
         # TODO : compare own blockchain with blockchain received from other servers
-        print("Other peer's blockchain: ", blockchain)
+        # print("Other peer's blockchain: ", blockchain)
         # print(len(blockchain))
 
         # if the length of other peer's blockchain is greater than own blockchain, then update own blockchain
         if len(blockchain) > len(self.blockchain.blockchain):
             # validate pow based on the last two blocks
             if self.validate_pow(blockchain):
-                print("POW is correct")
+                # print("POW is correct")
                 self.blockchain.blockchain = blockchain
                 # discard transactions that are part of the last block
                 # especially when peer joined late and received lesser transactions 
                 last_block = blockchain[-1]
                 transactions = last_block['transaction']
-                print("Last block's transactions: ", transactions)
+                # print("Last block's transactions: ", transactions)
 
                 for transaction in transactions:
                     if transaction in self.blockchain.pool:
-                        print("Transaction ", transaction, " is part of the last block")
+                        # print("Transaction ", transaction, " is part of the last block")
                         self.blockchain.pool.remove(transaction)
             else:
                 print("POW is incorrect")
@@ -84,10 +84,10 @@ class BlockchainServer():
 
                         s.close()
                 except Exception as e:
-                    pass
-                    # print("Peer's Server socket not yet establised")
-                    # print(e)
-            time.sleep(15)
+                    # pass
+                    print("Peer's Server socket not yet establised")
+                    print(e)
+            time.sleep(5)
 
     def serverHandler(self, c , addr):
         # get peer name
@@ -102,7 +102,7 @@ class BlockchainServer():
             # Parsing and processing data from client
             data_rev = c.recv(1024)
             if len(data_rev) == 0 or not data_rev:
-                # print("Client socket closed")
+                print("Peer's socket closed")
                 break
 
             dataString = data_rev.decode('utf-8')
@@ -127,8 +127,8 @@ class BlockchainServer():
 
                         # #TODO deal with problems where transaction can't be broadcasted to some peers
                         for neighbour in self.neighbours:
-                            print("Neighbour: ", neighbour)
-                            print(self.neighbours[neighbour])
+                            # print("Neighbour: ", neighbour)
+                            # print(self.neighbours[neighbour])
                             try:
                                 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                                     s.connect((IP, self.neighbours[neighbour]))
@@ -136,10 +136,10 @@ class BlockchainServer():
 
                                     data_rev = s.recv(1024)
                                     response = data_rev.decode('utf-8')
-                                    print("Transaction Response from other peer's server: ", response)
+                                    # print("Transaction Response from other peer's server: ", response)
                                     s.close()
                             except Exception as e:
-                                print(e)
+                                print("Send transaction error: ", e)
                                 pass
 
                 else:
@@ -202,8 +202,10 @@ class BlockchainServer():
             c.sendall(clientData)
             
             if typeRequest == 'cc':
+                print("Client thread closing")
                 break
         c.close()
+        print("Client thread closed")
         return
 
     def run(self):
@@ -222,15 +224,15 @@ class BlockchainServer():
                 s.listen(5)
                 while True:
                     # to avoid deadlock, counter can be used here: if counter == 6 or cc = 'cc':
-                    if cc == 'cc' or counter == 6: 
-                        break
+                    # if cc == 'cc': 
+                    #     break
                     c, addr = s.accept()
                     print("Address connected to server: ", addr)
                     # print(self.saved_address)
                     # print(socket.socket.getpeername())
-                    time.sleep(1)
-                    print("From server (sockname)", s.getsockname())
-                    print("From server (peername)", s.getpeername())
+                    # time.sleep(1)
+                    # print("From server (sockname)", s.getsockname())
+                    # print("From server (peername)", s.getpeername())
                     if c not in self.saved_address and len(self.saved_address) < 2:
                         self.saved_address[c] = addr
 
@@ -241,7 +243,7 @@ class BlockchainServer():
                     threading.Thread(target=self.serverHandler, args=(c, addr)).start()
                     # _thread.start_new_thread(self.serverHandler,(c, addr))
                 s.close()
-                return
+                
         except Exception as e:
             print("Server: Can't connect to the Socket")
             print(e)

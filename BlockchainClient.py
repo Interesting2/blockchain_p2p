@@ -21,8 +21,8 @@ class BlockchainClient():
         try:
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s: # Create a socket object
                 s.connect((HOST, self.port_no))
-                print("From client (peername): ", s.getpeername())
-                print("From client (sockname): ", s.getsockname())
+                # print("From client (peername): ", s.getpeername())
+                # print("From client (sockname): ", s.getsockname())
 
                 while(1):
             
@@ -73,7 +73,7 @@ class BlockchainClient():
                         # blockchainJson = json.loads(dataString)
                         print(json.dumps(dataString, indent=2, sort_keys=False))
                     elif commandType == 'cc':
-                        print(dataString)
+                        print("Client: ", dataString)
                         break
                     elif commandType == 'tx':
                         print("Client Transaction response from server: ", dataString)
@@ -84,6 +84,7 @@ class BlockchainClient():
 
             print("Can't connect to the Blockchain server")
             print(e)
+        print("END OF CLIENT")
 
 # client = BlockchainClient('A', 6000, {})
 # client.run()
