@@ -21,6 +21,9 @@ class BlockchainClient():
         try:
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s: # Create a socket object
                 s.connect((HOST, self.port_no))
+                print("From client (peername): ", s.getpeername())
+                print("From client (sockname): ", s.getsockname())
+
                 while(1):
             
                     # Parser for input command

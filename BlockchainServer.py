@@ -227,6 +227,10 @@ class BlockchainServer():
                     c, addr = s.accept()
                     print("Address connected to server: ", addr)
                     # print(self.saved_address)
+                    # print(socket.socket.getpeername())
+                    time.sleep(1)
+                    print("From server (sockname)", s.getsockname())
+                    print("From server (peername)", s.getpeername())
                     if c not in self.saved_address and len(self.saved_address) < 2:
                         self.saved_address[c] = addr
 
