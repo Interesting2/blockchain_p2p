@@ -10,6 +10,7 @@ import threading
 import socket
 import time
 import json
+from MyThread import MyThread
 
 IP = "127.0.0.1"
 
@@ -25,8 +26,6 @@ class BlockchainPeer():
             for i in range(1, num_lines + 1):
                 neighbour_id, neigbour_port = lines[i].strip('\n').split(" ")
                 self.neighbour[neighbour_id] = int(neigbour_port)
-            # print("Neighbours: ")
-            # print(self.neighbour)
 
 
     def execute(self, role):
@@ -35,6 +34,7 @@ class BlockchainPeer():
     def run(self):
         self.setUpNeighbours()
 
+        stop_thread = False
         # create miner, server and client
         server = BlockchainServer(self.peer_id, self.port_no, self.neighbour)
         client = BlockchainClient(self.peer_id, self.port_no, self.neighbour)

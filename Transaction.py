@@ -9,7 +9,7 @@ class Transaction():
         contentValidation = False
         receivedContent = str(transaction)
         receivedContent = receivedContent.split('|')
-        # pattern = re.compile("[A-Za-z0-9]{4}")    
+
         pattern = re.compile("[A-Za-z]{4}[0-9]{4}")
 
         if pattern.fullmatch(receivedContent[1]) is not None:
@@ -23,9 +23,7 @@ class Transaction():
             contentValidation = True
         
         if senderValidation == True and contentValidation == True:
-            # print("Valid Transaction")
             return transaction
         else:
-            # print("Invalid Transaction")
             return None
         

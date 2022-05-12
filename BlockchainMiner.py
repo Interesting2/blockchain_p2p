@@ -22,16 +22,13 @@ class BlockchainMiner():
                 
                 while True:
                     latest_proof = self.get_proof(s)
-                    # print("Miner: ", latest_proof)
+
                     if latest_proof != self.latest_proof:
-                        # print("COMPARE LATEST PROOFS")
-                        # print(latest_proof, self.latest_proof)
-                        # self.update_proof(latest_proof)
+
                         self.latest_proof = latest_proof
                         new_proof = self.proof_of_work(latest_proof)
-                        # print(f"New proof: {new_proof}")
                         self.update_proof(new_proof, s)
-                    time.sleep(10)
+                    time.sleep(1)
                 s.close()
         except Exception as e:
             print(e)
@@ -40,11 +37,9 @@ class BlockchainMiner():
     def get_proof(self, s):
         # send request to server
         requestString = "gp"
-        # send request to server
         data = None
         s.send(requestString.encode('utf-8'))
         data = s.recv(1024)
-        # print("PROOF RETURNED: ", data.decode('utf-8'))
        
         return int(data.decode('utf-8'))
 
@@ -53,8 +48,8 @@ class BlockchainMiner():
         requestString = "up | " + str(new_proof)
         # send request to server
         s.send(requestString.encode('utf-8'))
-        data = s.recv(1024)
-        # print("REWARD RESPONSE: ", data.decode('utf-8'))
+        data = s.recv(1024)     # receive reward or no reward from server
+        print(data.decode('utf-8'))
 
     def calculateHash(self, data):
         return hashlib.sha256(data.encode('utf-8')).hexdigest()
