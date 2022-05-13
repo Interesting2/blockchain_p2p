@@ -55,6 +55,8 @@ class BlockchainServer():
 
     def periodic_heartbeat(self):
         while True:
+            if cc == 'cc':
+                return
             requestContent = "hb"
             mess_data = bytes(requestContent, encoding= 'utf-8')
 
@@ -86,91 +88,94 @@ class BlockchainServer():
             counter += 1 
 
             # Parsing and processing data from client
-            data_rev = c.recv(1024)
-            if len(data_rev) == 0 or not data_rev:
-                break
+            try:
+                data_rev = c.recv(1024)
+                if len(data_rev) == 0 or not data_rev:
+                    break
 
-            dataString = data_rev.decode('utf-8')
+                dataString = data_rev.decode('utf-8')
 
-            typeRequest = dataString[:2]
-            clientData = ""
-            # Handle tx request
-            if typeRequest == 'tx':
-                transaction = Transaction()
-                transactionContent = transaction.validateTransaction(dataString)
-                if transactionContent != None:
-                    self.blockchain.addTransaction(transactionContent)
-                    clientData = "Accepted"
+                typeRequest = dataString[:2]
+                clientData = ""
+                # Handle tx request
+                if typeRequest == 'tx':
+                    transaction = Transaction()
+                    transactionContent = transaction.validateTransaction(dataString)
+                    if transactionContent != None:
+                        self.blockchain.addTransaction(transactionContent)
+                        clientData = "Accepted"
 
 
-                    # broadcast transaction to other peers
-                    if c in self.saved_address:
+                        # broadcast transaction to other peers
+                        if c in self.saved_address:
 
-                        # deal with problems where transaction can't be broadcasted to some peers
-                        for neighbour in self.neighbours:
-                            try:
-                                with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-                                    s.connect((IP, self.neighbours[neighbour]))
-                                    s.sendall(bytes(dataString, encoding= 'utf-8'))
+                            # deal with problems where transaction can't be broadcasted to some peers
+                            for neighbour in self.neighbours:
+                                try:
+                                    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                                        s.connect((IP, self.neighbours[neighbour]))
+                                        s.sendall(bytes(dataString, encoding= 'utf-8'))
 
-                                    data_rev = s.recv(1024)
-                                    response = data_rev.decode('utf-8')
-                                    s.close()
-                            except Exception as e:
-                                pass
-                else:
-                    clientData = "Rejected"
+                                        data_rev = s.recv(1024)
+                                        response = data_rev.decode('utf-8')
+                                        s.close()
+                                except Exception as e:
+                                    pass
+                    else:
+                        clientData = "Rejected"
 
-            # Handle pb request
-            elif typeRequest == 'pb':
-                clientData = json.dumps(self.blockchain.blockchain, indent=2, sort_keys=False)
+                # Handle pb request
+                elif typeRequest == 'pb':
+                    clientData = json.dumps(self.blockchain.blockchain, indent=2, sort_keys=False)
 
-            # Handle cc request
-            elif typeRequest == 'cc':
-                cc = 'cc'
-                clientData = "Connection closed!"
+                # Handle cc request
+                elif typeRequest == 'cc':
+                    cc = 'cc'
+                    clientData = "Connection closed!"
 
-            # Handle gp request
-            elif typeRequest == 'gp':
-                # get current proof of work of the lastest block
-                clientData = str(self.blockchain.lastBlock()['proof'])
+                # Handle gp request
+                elif typeRequest == 'gp':
+                    # get current proof of work of the lastest block
+                    clientData = str(self.blockchain.lastBlock()['proof'])
 
-            
-            # Handle up request
-            elif typeRequest == 'up':
-                dataContent = dataString.split("|")
-                if len(dataContent) == 2:
-                    proof = int(dataContent[1])
+                
+                # Handle up request
+                elif typeRequest == 'up':
+                    dataContent = dataString.split("|")
+                    if len(dataContent) == 2:
+                        proof = int(dataContent[1])
 
-                    # checks correctness of proof
-                    prev_proof = self.blockchain.lastBlock()['proof']
-                    hash_operation = hashlib.sha256(str(proof**2 - prev_proof**2).encode('utf-8')).hexdigest()
-                    if hash_operation[:2] == '00':
-                        self.proof = proof
-                        clientData = "Reward"
+                        # checks correctness of proof
+                        prev_proof = self.blockchain.lastBlock()['proof']
+                        hash_operation = hashlib.sha256(str(proof**2 - prev_proof**2).encode('utf-8')).hexdigest()
+                        if hash_operation[:2] == '00':
+                            self.proof = proof
+                            clientData = "Reward"
+                        else:
+                            clientData = "No Reward"
                     else:
                         clientData = "No Reward"
+
+                # Handle hb request 
+                elif typeRequest == 'hb':
+                    # returns current blockchain in json
+                    clientData = json.dumps(self.blockchain.blockchain, indent=1, sort_keys=False)
+                    
+
+                # Handle unknown request
                 else:
-                    clientData = "No Reward"
+                    clientData = "Unknown request"
 
-            # Handle hb request 
-            elif typeRequest == 'hb':
-                # returns current blockchain in json
-                clientData = json.dumps(self.blockchain.blockchain, indent=1, sort_keys=False)
+                # create new block if #transactions == 5
+                if len(self.blockchain.pool) == 5:
+                    self.blockchain.newBlock(self.proof)
+
+                clientData = bytes(clientData, encoding='utf-8')
+                c.sendall(clientData)
                 
-
-            # Handle unknown request
-            else:
-                clientData = "Unknown request"
-
-            # create new block if #transactions == 5
-            if len(self.blockchain.pool) == 5:
-                self.blockchain.newBlock(self.proof)
-
-            clientData = bytes(clientData, encoding='utf-8')
-            c.sendall(clientData)
-            
-            if typeRequest == 'cc':
+                if typeRequest == 'cc':
+                    break
+            except Exception as e:
                 break
         c.close()
         if cc == 'cc':

@@ -10,7 +10,6 @@ import threading
 import socket
 import time
 import json
-from MyThread import MyThread
 
 IP = "127.0.0.1"
 
