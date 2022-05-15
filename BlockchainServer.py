@@ -35,22 +35,19 @@ class BlockchainServer():
     def sync_blockchain(self, blockchain):
         # compare own blockchain with blockchain received from other servers
 
-        # if the length of other peer's blockchain is greater than own blockchain, then update own blockchain
-        if len(blockchain) > len(self.blockchain.blockchain):
-            # validate pow based on the last two blocks
-            if self.validate_pow(blockchain):
+        # validate pow based on the last two blocks
+        if self.validate_pow(blockchain):
 
-                self.blockchain.blockchain = blockchain
-                # discard transactions that are part of the last block
-                # especially when peer joined late and received lesser transactions 
-                last_block = blockchain[-1]
-                transactions = last_block['transaction']
+            self.blockchain.blockchain = blockchain
+            # discard transactions that are part of the last block
+            # especially when peer joined late and received lesser transactions 
+            last_block = blockchain[-1]
+            transactions = last_block['transaction']
 
-                for transaction in transactions:
-                    if transaction in self.blockchain.pool:
-                        self.blockchain.pool.remove(transaction)
-            else:
-                return
+            for transaction in transactions:
+                if transaction in self.blockchain.pool:
+                    self.blockchain.pool.remove(transaction)
+
 
 
     def periodic_heartbeat(self):
